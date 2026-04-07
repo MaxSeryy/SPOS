@@ -1,0 +1,5 @@
+# .vscode
+build/
+.gittignore
+hardware_regs/
+hardware_structs/

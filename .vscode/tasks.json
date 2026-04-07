@@ -1,0 +1,79 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        // {
+        //     "label": "Build Pico OS (Fast)",
+        //     "type": "shell",
+        //     "command": "if not exist build mkdir build && cd build && cmake -G Ninja .. && ninja",
+        //     "options": {
+        //         "shell": {
+        //             "executable": "cmd.exe",
+        //             "args": ["/d", "/c"]
+        //         }
+        //     },
+        //     "group": {
+        //         "kind": "build",
+        //         "isDefault": true
+        //     },
+        //     "problemMatcher": ["$gcc"]
+        // },
+        {
+            "label": "Clean Rebuild Pico OS (Full)",
+            "type": "shell",
+            "command": "if exist build rmdir /S /Q build && mkdir build && cd build && cmake -G Ninja .. && ninja",
+            "options": {
+                "shell": {
+                    "executable": "cmd.exe",
+                    "args": ["/d", "/c"]
+                }
+            },
+                        "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$gcc"]
+        }
+        // {
+        //     "label": "SPOS",
+        //     "type": "shell",
+        //     "command": "if not exist build mkdir build && cd build && cmake -G Ninja .. && ninja",
+        //     "options": {
+        //         "shell": {
+        //             "executable": "cmd.exe",
+        //             "args": ["/d", "/c"]
+        //         }
+        //     },
+        //     "group": {
+        //         "kind": "build",
+        //         "isDefault": true
+        //     },
+        //     "problemMatcher": ["$gcc"]
+        // },
+        // {
+        //     "label": "SPOS: Clean",
+        //     "type": "shell",
+        //     "command": "if exist build rmdir /s /q build",
+        //     "options": {
+        //         "shell": {
+        //             "executable": "cmd.exe",
+        //             "args": ["/d", "/c"]
+        //         }
+        //     },
+        //     "group": "build",
+        //     "problemMatcher": []
+        // },
+        // {
+        //     "label": "SPOS: Clean Build",
+        //     "type": "shell",
+        //     "command": "if exist build rmdir /s /q build && if not exist build mkdir build && cd build && cmake -G Ninja .. && ninja",
+        //     "options": {
+        //         "shell": {
+        //             "executable": "cmd.exe",
+        //             "args": ["/d", "/c"]
+        //         }
+        //     },
+        //     "group": "build",
+        //     "problemMatcher": ["$gcc"]
+        // }
+    ]
+}

@@ -3,6 +3,7 @@
 #include "uart.h"
 
 #include "clocks.h"
+#include "heap.h"
 
 uint32_t task1_stack[STACK_SIZE]; // stack for first task (header OS)
 uint32_t task2_stack[STACK_SIZE]; // for blinker
@@ -90,12 +91,24 @@ void Task_Terminal()
                 {
                     cmd_led(arg);
                 }
+                else if (my_strcmp(cmd_buf, "mem") == 0)
+                {
+                    char *test_str = (char *)os_malloc(100);
+                   if (test_str) {
+                        kprintf("\r\n[DEBUG] 100 bytes allocated at 0x%x", (unsigned int)test_str);
+                        os_heap_stats();
+                        
+                        os_free(test_str);
+                        kprintf("\r\n[DEBUG] Memory freed.");
+                        os_heap_stats();
+                    } else {
+                        kprintf("\r\n[ERROR] Out of memory!");
+                    } 
+                }
                 else if (cmd_buf[0] != '\0')
                 {
                     kprintf("\r\nUnknown command: '%s'", cmd_buf);
                 }
-                // ----------------------------
-
                 cmd_idx = 0; // reset command buffer index
                 kprintf("\r\nOS> ");
             }
@@ -143,6 +156,8 @@ void Task_Terminal()
         } // wait fore reset complete
 
         init_uart_custom(); // init own uart
+
+        os_heap_init(); // init heap before any malloc
 
         os_create_task(0, Task_Terminal, task1_stack); // create TASK 1
         os_create_task(1, Task_Blinker, task2_stack);  // create TASK 2

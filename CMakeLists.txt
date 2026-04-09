@@ -19,6 +19,7 @@ add_executable(os.elf
     arch/startup.S
     arch/port.c
     kernel/os.c
+    kernel/heap.c
     drivers/uart.c
     drivers/clocks.c
     app/main.c

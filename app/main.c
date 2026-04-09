@@ -57,7 +57,7 @@ void cmd_led(const char *arg) {
 void Task_Terminal()
 {
     uart_puts("\r\n=================================\r\n");
-    uart_puts(" Pico OS: Multitasking Enabled! \r\n");
+    uart_puts(" Pico OS v0.2 \r\n");
     uart_puts("=================================\r\n");
     uart_puts("OS> ");
 
@@ -70,7 +70,7 @@ void Task_Terminal()
         int c = uart_getc(); // get char from UART
         if (c != -1)
         {
-            uart_putc((char)c); // echo back
+            // uart_putc((char)c); // echo back
             
             if (c == '\r')
             {
@@ -99,9 +99,17 @@ void Task_Terminal()
                 cmd_idx = 0; // reset command buffer index
                 kprintf("\r\nOS> ");
             }
+            else if (c == '\b' || c == 0x7f)
+            {
+                if (cmd_idx > 0) {
+                    cmd_idx--;
+                    uart_puts("\b \b"); // erase char on terminal
+                }
+            }
             // logic: if char is printable and we have space in buffer, add to command buffer
             else if (cmd_idx < 31 && c >= 32 && c <= 126) 
             {
+                uart_putc((char)c); // echo char
                 cmd_buf[cmd_idx] = (char)c;
                 cmd_idx++;
             }

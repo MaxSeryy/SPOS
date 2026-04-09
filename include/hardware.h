@@ -9,6 +9,9 @@
 #define SIO_BASE          0xd0000000    // 42
 #define UART0_BASE        0x40034000    // 429
 
+#define XOSC_BASE         0x40024000    // external crystal oscillator 219
+#define PLL_SYS_BASE      0x40028000    // system PLL 234
+
 #define SYSTICK_CSR       0xE000E010    //https://developer.arm.com/documentation/101407/0543/Debugging/Debug-Windows-and-Dialogs/Core-Peripherals/Armv6-M-cores/Armv6-M--System-Tick-Timer?lang=en
 #define SYSTICK_RVR       0xE000E014
 #define SYSTICK_CVR       0xE000E018

@@ -14,8 +14,8 @@ void init_uart_custom() {
     REG32(IO_BANK0_BASE + 0x004) = 2; // TX
     REG32(IO_BANK0_BASE + 0x00c) = 2; // RX
 
-    REG32(UART0_BASE + 0x24) = 34;                              // baud rate divisor for 115200 baud with 48MHz clock
-    REG32(UART0_BASE + 0x28) = 0;                               // no fractional part
+    REG32(UART0_BASE + 0x24) = 72;                              // baud rate divisor for 115200 baud with 48MHz clock
+    REG32(UART0_BASE + 0x28) = 10;                              // no fractional part
     REG32(UART0_BASE + 0x2c) = (3 << 5) | (1 << 4);             // enable FIFOs, clear them
     REG32(UART0_BASE + 0x30) = (1 << 0) | (1 << 8) | (1 << 9);  // enable RX interrupt, enable UART, enable TX/RX
 }

@@ -26,7 +26,7 @@ void os_start() {
     // SET MOST low priority for PendSV and SysTick (for preemptive multitasking)
     REG32(SHPR3) = (0xFF << 16) | (0xFF << 24);
 
-    REG32(SYSTICK_RVR) = 65000 - 1; // ~1ms tick (assuming 65MHz clock)
+    REG32(SYSTICK_RVR) = 1330000 - 1; // ~1ms tick (assuming 133MHz clock)
     REG32(SYSTICK_CVR) = 0;         // clear current value
     REG32(SYSTICK_CSR) = 7;         // enable SysTick, use processor clock, enable interrupt
 

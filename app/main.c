@@ -2,6 +2,8 @@
 #include "os.h"
 #include "uart.h"
 
+#include "clocks.h"
+
 uint32_t task1_stack[STACK_SIZE]; // stack for first task (header OS)
 uint32_t task2_stack[STACK_SIZE]; // for blinker
 
@@ -125,6 +127,7 @@ void Task_Terminal()
 
     int main()
     {
+        init_clocks_133mhz(); // set 133MHz clock for UART and SysTick
         // reseet peripherals (uart troubleshooting)
         REG32(RESETS_BASE + 0x3000) = (1 << 5) | (1 << 8); // UART0 and IO_BANK0
         while ((REG32(RESETS_BASE + 0x8) & ((1 << 5) | (1 << 8))) != ((1 << 5) | (1 << 8)))

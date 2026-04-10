@@ -87,3 +87,8 @@ __attribute__((naked)) void SVC_Handler(void) {
 void SysTick_Handler(void) {
     REG32(ICSR) = (1 << 28);
 }
+
+void os_yield() {
+    REG32(ICSR) = (1 << 28); // trigger PendSV by setting its pending bit
+    __asm volatile ("isb"); // ensure all memory operations complete before context switch
+}

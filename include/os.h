@@ -16,4 +16,6 @@ extern volatile int current_task;
 void os_create_task(int id, void (*task_fn)(void), uint32_t *stack);
 void os_start(void);
 
+void os_yield(void); // yield to scheduler (trigger PendSV)
+
 #endif // OS_H

@@ -5,6 +5,10 @@
 #include "clocks.h"
 #include "heap.h"
 
+#include "sync.h"
+os_mutex_t print_mutex;
+os_queue_t log_queue;
+
 uint32_t task1_stack[STACK_SIZE]; // stack for first task (header OS)
 uint32_t task2_stack[STACK_SIZE]; // for blinker
 
@@ -58,16 +62,24 @@ void cmd_led(const char *arg) {
 void Task_Terminal()
 {
     uart_puts("\r\n=================================\r\n");
-    uart_puts(" Pico OS v0.2 \r\n");
+    uart_puts(" Pico OS v0.4 \r\n");
     uart_puts("=================================\r\n");
     uart_puts("OS> ");
 
     char cmd_buf[32];
     int cmd_idx = 0;
+    cmd_buf[0] = '\0'; // initialize command buffer
 
     // echo terminal
     while (1)
     {
+        char *log_msg = (char *)os_queue_receive_try(&log_queue);
+        if (log_msg) {
+            uart_puts("\r                          \r");
+            kprintf("%s\r\n", log_msg);
+            cmd_buf[cmd_idx] = '\0';
+            kprintf("OS> %s", cmd_buf);
+        }
         int c = uart_getc(); // get char from UART
         if (c != -1)
         {
@@ -89,7 +101,10 @@ void Task_Terminal()
                 }
                 else if (my_strcmp(cmd_buf, "led") == 0)
                 {
+                    os_mutex_lock(&print_mutex);
                     cmd_led(arg);
+                    os_mutex_unlock(&print_mutex);
+                    
                 }
                 else if (my_strcmp(cmd_buf, "mem") == 0)
                 {
@@ -133,17 +148,26 @@ void Task_Terminal()
     // TASK 2
     void Task_Blinker()
     {
+
+        while(1) {
+        // Задача намагається щось надрукувати кожні кілька мільйонів тактів
+        for (volatile int i = 0; i < 5000000; i++); 
+        os_queue_send(&log_queue, "[Task 2] I am alive!"); 
+        // os_mutex_lock(&print_mutex); // Чекає своєї черги до UART
+        // kprintf("\r\n[Task 2] I am alive!\r\nOS> ");
+        // os_mutex_unlock(&print_mutex);
+        }
         // REG32(IO_BANK0_BASE + 0x0cc) = 5;    // GPIO 25
         // REG32(SIO_BASE + 0x024) = (1 << 25); // 25th bit - output
 
         // blinker
-        while (1)
-        {                                        //
+        // while (1)
+        // {                                        //
         //     REG32(SIO_BASE + 0x01c) = (1 << 25); // XOR
         //     for (volatile int i = 0; i < 500000; i++)
         //     {
         //     }
-        }
+        // }
     }
 
     int main()
@@ -154,9 +178,9 @@ void Task_Terminal()
         while ((REG32(RESETS_BASE + 0x8) & ((1 << 5) | (1 << 8))) != ((1 << 5) | (1 << 8)))
         {
         } // wait fore reset complete
-
+        os_mutex_init(&print_mutex);
         init_uart_custom(); // init own uart
-
+        os_queue_init(&log_queue); // init log queue
         os_heap_init(); // init heap before any malloc
 
         os_create_task(0, Task_Terminal, task1_stack); // create TASK 1

@@ -61,10 +61,11 @@ void cmd_led(const char *arg) {
 // TASK 1
 void Task_Terminal()
 {
-    uart_puts("\r\n=================================\r\n");
-    uart_puts(" Pico OS v0.4 \r\n");
-    uart_puts("=================================\r\n");
-    uart_puts("OS> ");
+    kprintf("\r\n=================================\r\n");
+    kprintf("============ Pico OS ============\r\n");
+    kprintf("============== 0.4 ==============\r\n");
+    kprintf("=================================\r\n");
+    kprintf("OS> ");
 
     char cmd_buf[32];
     int cmd_idx = 0;
@@ -75,7 +76,7 @@ void Task_Terminal()
     {
         char *log_msg = (char *)os_queue_receive_try(&log_queue);
         if (log_msg) {
-            uart_puts("\r                          \r");
+            kprintf("\r                          \r");
             kprintf("%s\r\n", log_msg);
             cmd_buf[cmd_idx] = '\0';
             kprintf("OS> %s", cmd_buf);
@@ -106,6 +107,14 @@ void Task_Terminal()
                     os_mutex_unlock(&print_mutex);
                     
                 }
+                else if (my_strcmp(cmd_buf, "help") == 0)
+                {
+                    kprintf("\r\nAvailable commands:\r\n");
+                    kprintf("  boot - Reboot the system (not implemented)\r\n");
+                    kprintf("  led <on|off> - Control the LED\r\n");
+                    kprintf("  mem - Test heap allocation\r\n");
+                    kprintf("  clear - clear the terminal-_-\r\n");
+                }
                 else if (my_strcmp(cmd_buf, "mem") == 0)
                 {
                     char *test_str = (char *)os_malloc(100);
@@ -119,6 +128,9 @@ void Task_Terminal()
                     } else {
                         kprintf("\r\n[ERROR] Out of memory!");
                     } 
+                }
+                else if (my_strcmp(cmd_buf, "clear") == 0) {
+                    kprintf("\r\n\x1b[2J\x1b[H"); // ansi code
                 }
                 else if (cmd_buf[0] != '\0')
                 {
@@ -151,8 +163,8 @@ void Task_Terminal()
 
         while(1) {
         // Задача намагається щось надрукувати кожні кілька мільйонів тактів
-        for (volatile int i = 0; i < 5000000; i++); 
-        os_queue_send(&log_queue, "[Task 2] I am alive!"); 
+        // for (volatile int i = 0; i < 5000000; i++); 
+        // os_queue_send(&log_queue, "[Task 2] I am alive!"); 
         // os_mutex_lock(&print_mutex); // Чекає своєї черги до UART
         // kprintf("\r\n[Task 2] I am alive!\r\nOS> ");
         // os_mutex_unlock(&print_mutex);

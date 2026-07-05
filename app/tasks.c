@@ -1,27 +1,30 @@
 #include "tasks.h"
-#include "hardware.h"
-#include "sync.h"
+#include "os.h"
+#include "gpio.h"
 
-// TASK 2
+#define LED_PIN 25
+#define BLINK_INTERVAL_MS 500
+
+// TASK 2 — blinks the onboard LED using os_tick_count for timing.
+// Instead of a busy-wait loop, it sleeps with WFI between checks: the CPU
+// is genuinely idle (lower power) until the next interrupt (SysTick, at
+// worst 1ms later) wakes it up to check the clock again.
 void Task_Blinker(void) {
+    gpio_init(LED_PIN);
+    uint32_t last_toggle = os_tick_count;
+    int led_on = 0;
 
     while (1) {
-        // Задача намагається щось надрукувати кожні кілька мільйонів тактів
-        // for (volatile int i = 0; i < 5000000; i++);
-        // os_queue_send(&log_queue, "[Task 2] I am alive!");
-        // os_mutex_lock(&print_mutex); // Чекає своєї черги до UART
-        // kprintf("\r\n[Task 2] I am alive!\r\nOS> ");
-        // os_mutex_unlock(&print_mutex);
+        if ((os_tick_count - last_toggle) >= BLINK_INTERVAL_MS) {
+            led_on = !led_on;
+            if (led_on) gpio_set(LED_PIN);
+            else gpio_clear(LED_PIN);
+            last_toggle = os_tick_count;
+        }
+        __asm volatile ("wfi"); // sleep until the next interrupt instead of spinning
     }
-    // REG32(IO_BANK0_BASE + 0x0cc) = 5;    // GPIO 25
-    // REG32(SIO_BASE + 0x024) = (1 << 25); // 25th bit - output
+}
 
-    // blinker
-    // while (1)
-    // {                                        //
-    //     REG32(SIO_BASE + 0x01c) = (1 << 25); // XOR
-    //     for (volatile int i = 0; i < 500000; i++)
-    //     {
-    //     }
-    // }
+void Shell(void) {
+    // TASK 1 is implemented in shell.c
 }

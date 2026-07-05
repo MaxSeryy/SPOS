@@ -17,7 +17,7 @@ void init_uart_custom() {
     REG32(UART0_BASE + 0x24) = 72;                              // baud rate divisor for 115200 baud with 48MHz clock
     REG32(UART0_BASE + 0x28) = 10;                              // no fractional part
     REG32(UART0_BASE + 0x2c) = (3 << 5) | (1 << 4);             // enable FIFOs, clear them
-    REG32(UART0_BASE + 0x30) = (1 << 0) | (1 << 8) | (1 << 9);  // enable RX interrupt, enable UART, enable TX/RX
+    REG32(UART0_BASE + 0x30) = (1 << 0) | (1 << 8) | (1 << 9);  // UARTCR: UARTEN | TXE | RXE (this is polled RX via uart_getc, no interrupt involved)
 }
 // send char to UART & timeout
 void uart_putc(char c) {

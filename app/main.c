@@ -21,8 +21,8 @@ int main() {
     shell_init();        // init print_mutex + log_queue
     os_heap_init();       // init heap before any malloc
 
-    os_create_task(0, Task_Terminal, task1_stack); // create TASK 1
-    os_create_task(1, Task_Blinker, task2_stack);  // create TASK 2
+    os_create_task(Task_Terminal, task1_stack); // create TASK 1
+    //os_create_task(Task_Blinker, task2_stack);  // create TASK 2
 
     os_start();
 

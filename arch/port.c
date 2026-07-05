@@ -22,23 +22,25 @@ __attribute__((naked)) void PendSV_Handler(void) {
         "ldr r1, =current_task \n"  // save curr task index
         "ldr r1, [r1] \n"           // get id of curr task
         "ldr r2, =tcb \n"           // get tcb arr base & save to r2
-        "lsls r1, r1, #2 \n"        // shift left r1 * 4 (sizeof TCB_t)
+        "lsls r1, r1, #3 \n"        // shift left r1 * 8 (sizeof TCB_t = 2 pointers now)
         "adds r2, r2, r1 \n"        // get curr tcb
-        "str r0, [r2] \n"           // save curr sp to tcb
+        "str r0, [r2] \n"           // save curr sp to tcb (first field: sp)
 
         "ldr r1, =current_task \n"
         "ldr r2, [r1] \n"
         "adds r2, #1 \n"
-        "cmp r2, #2 \n"             // 2 == 2?
-        "bne save_idx \n"           // if not, save new index
-        "movs r2, #0 \n"            // else, reset to 0
+        "ldr r3, =num_tasks \n"     // wrap around the actual number of live tasks,
+        "ldr r3, [r3] \n"           // not a hardcoded task count
+        "cmp r2, r3 \n"
+        "bne save_idx \n"           // if not at the end, keep new index
+        "movs r2, #0 \n"            // else, wrap to task 0
     "save_idx: \n"
         "str r2, [r1] \n"
 
         "ldr r1, =tcb \n"           // get tcb arr base
-        "lsls r2, r2, #2 \n"        // shift
+        "lsls r2, r2, #3 \n"        // shift by sizeof(TCB_t) = 8 bytes
         "adds r1, r1, r2 \n"        // restore cont of new task
-        "ldr r0, [r1] \n"           // restore r0 (new sp)
+        "ldr r0, [r1] \n"           // restore r0 (new sp, first field of TCB_t)
 
         "adds r0, #16 \n"           // make space for r4-r11...
         "ldmia r0!, {r4-r7} \n"
@@ -62,7 +64,7 @@ __attribute__((naked)) void SVC_Handler(void) {
     __asm volatile (
         ".syntax unified \n"        // similar to PendSV, but don't save curr task (first run)
         "ldr r0, =tcb \n"
-        "ldr r0, [r0] \n"
+        "ldr r0, [r0] \n"           // tcb[0].sp (first field of TCB_t)
         
         "ldmia r0!, {r4-r7} \n"
         "mov r8, r4 \n"
@@ -85,6 +87,8 @@ __attribute__((naked)) void SVC_Handler(void) {
 
 // sys timer
 void SysTick_Handler(void) {
+    os_tick_count++;
+    os_check_stacks(); // cheap: one word compare per live task
     REG32(ICSR) = (1 << 28);
 }
 

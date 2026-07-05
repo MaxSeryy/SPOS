@@ -15,15 +15,19 @@ set(CMAKE_EXE_LINKER_FLAGS "-T ${CMAKE_SOURCE_DIR}/pico.ld -nostartfiles -Wl,--g
 
 include_directories(include)
 
-add_executable(os.elf 
+add_executable(os.elf
     arch/startup.S
     arch/port.c
     kernel/os.c
     kernel/heap.c
     kernel/sync.c
+    kernel/string_utils.c
     drivers/uart.c
     drivers/clocks.c
+    drivers/gpio.c
     app/main.c
+    app/shell.c
+    app/tasks.c
 )
 
 target_link_libraries(os.elf gcc)
